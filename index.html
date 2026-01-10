@@ -1,0 +1,2507 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الصيانة المتكامل - مستشفى الزهراء</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --accent-light: #ff4d9e;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --info: #2ec4b6;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            
+            --gradient-primary: linear-gradient(135deg, #4361ee, #3a0ca3);
+            --gradient-success: linear-gradient(135deg, #4cc9f0, #2ec4b6);
+            --gradient-warning: linear-gradient(135deg, #f8961e, #f3722c);
+            --gradient-danger: linear-gradient(135deg, #f94144, #d90429);
+            --gradient-accent: linear-gradient(135deg, #f72585, #b5179e);
+            
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.2);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 30px;
+            --radius-full: 50px;
+            
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            min-height: 95vh;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* الهيدر */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon i {
+            font-size: 24px;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-details {
+            text-align: left;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .user-id {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .user-role {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 25px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* التنقل */
+        .nav-tabs {
+            background: var(--light);
+            display: flex;
+            border-bottom: 1px solid var(--gray-light);
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 0 10px;
+        }
+
+        .nav-tab {
+            padding: 20px 25px;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 600;
+            min-width: fit-content;
+            position: relative;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: var(--transition-normal);
+            z-index: -1;
+        }
+
+        .nav-tab.active {
+            color: white;
+        }
+
+        .nav-tab.active::before {
+            opacity: 1;
+        }
+
+        .nav-tab i {
+            font-size: 18px;
+            color: var(--primary);
+            transition: var(--transition-normal);
+        }
+
+        .nav-tab.active i {
+            color: white;
+        }
+
+        .badge {
+            background: var(--accent);
+            color: white;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* المحتوى */
+        .content {
+            padding: 30px;
+            min-height: calc(95vh - 130px);
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* صفحة تسجيل الدخول */
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .login-logo i {
+            font-size: 40px;
+            color: white;
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .role-option {
+            padding: 20px;
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            text-align: center;
+        }
+
+        .role-option.selected {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        .role-option i {
+            font-size: 32px;
+            margin-bottom: 15px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* النماذج */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            transition: var(--transition-normal);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* الأزرار */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-warning {
+            background: var(--gradient-warning);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-danger {
+            background: var(--gradient-danger);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-accent {
+            background: var(--gradient-accent);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .btn-rounded {
+            border-radius: var(--radius-full);
+        }
+
+        /* الجداول */
+        .table-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-top: 20px;
+            border: 1px solid var(--gray-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--gradient-primary);
+        }
+
+        th {
+            padding: 18px 20px;
+            text-align: right;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        td {
+            padding: 16px 20px;
+            text-align: right;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        tbody tr:hover {
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        /* شارات الحالة */
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #ffd166, #ff9e00);
+            color: #fff;
+        }
+
+        .status-in-progress {
+            background: linear-gradient(135deg, #4cc9f0, #4361ee);
+            color: #fff;
+        }
+
+        .status-completed {
+            background: linear-gradient(135deg, #06d6a0, #2ec4b6);
+            color: #fff;
+        }
+
+        .status-approved {
+            background: linear-gradient(135deg, #7209b7, #3a0ca3);
+            color: #fff;
+        }
+
+        .status-rejected {
+            background: linear-gradient(135deg, #f94144, #d90429);
+            color: #fff;
+        }
+
+        /* المودال */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .modal-title {
+            color: var(--dark);
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition-normal);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        /* الإشعارات */
+        .notification-system {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 9998;
+        }
+
+        .notification {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-right: 5px solid var(--primary);
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .notification-success {
+            border-color: var(--success);
+        }
+
+        .notification-success .notification-icon {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .notification-error {
+            border-color: var(--danger);
+        }
+
+        .notification-error .notification-icon {
+            background: rgba(249, 65, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .notification-warning {
+            border-color: var(--warning);
+        }
+
+        .notification-warning .notification-icon {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+
+        .notification-info {
+            border-color: var(--primary);
+        }
+
+        .notification-info .notification-icon {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        /* البطاقات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: var(--gradient-danger);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: var(--gradient-warning);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: var(--gradient-success);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: var(--gradient-primary);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* التحميل */
+        .loader {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .loader.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(67, 97, 238, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* التكيف */
+        @media (max-width: 768px) {
+            .container {
+                border-radius: var(--radius-lg);
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 12px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .nav-tab {
+                padding: 15px;
+                font-size: 13px;
+            }
+            
+            .login-container {
+                padding: 30px 20px;
+                margin: 20px auto;
+            }
+            
+            .role-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- مؤشر التحميل -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <div class="loader-text">جاري التحميل...</div>
+    </div>
+
+    <!-- نظام الإشعارات -->
+    <div class="notification-system" id="notification-system"></div>
+
+    <!-- صفحة تسجيل الدخول -->
+    <div id="login-page" class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                <i class="fas fa-hospital-alt"></i>
+            </div>
+            <h2>مستشفى الزهراء</h2>
+            <p style="color: var(--gray); margin-top: 10px;">نظام إدارة الصيانة الذكي</p>
+        </div>
+
+        <div class="role-selector">
+            <div class="role-option selected" data-role="employee" data-role-name="موظف">
+                <i class="fas fa-user-md"></i>
+                <div style="font-weight: 600; margin-bottom: 5px;">موظف</div>
+                <small style="color: var(--gray); font-size: 12px;">الإبلاغ عن الأعطال ومتابعتها</small>
+            </div>
+            
+            <div class="role-option" data-role="maintenance" data-role-name="مسؤول الصيانة">
+                <i class="fas fa-tools"></i>
+                <div style="font-weight: 600; margin-bottom: 5px;">مسؤول الصيانة</div>
+                <small style="color: var(--gray); font-size: 12px;">متابعة الأعطال وإصلاحها</small>
+            </div>
+            
+            <div class="role-option" data-role="maintenance-manager" data-role-name="مدير الصيانة">
+                <i class="fas fa-user-tie"></i>
+                <div style="font-weight: 600; margin-bottom: 5px;">مدير الصيانة</div>
+                <small style="color: var(--gray); font-size: 12px;">الموافقة على شراء قطع الصيانة</small>
+            </div>
+            
+            <div class="role-option" data-role="purchasing" data-role-name="مدير المشتريات">
+                <i class="fas fa-shopping-cart"></i>
+                <div style="font-weight: 600; margin-bottom: 5px;">مدير المشتريات</div>
+                <small style="color: var(--gray); font-size: 12px;">الموافقة على طلبات الموظفين</small>
+            </div>
+        </div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-id-card"></i>
+                    رقم الموظف
+                </label>
+                <div class="input-with-icon">
+                    <input type="text" id="employee-id" class="form-control" placeholder="EMP2024101" required>
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user-circle"></i>
+                    اسم المستخدم
+                </label>
+                <div class="input-with-icon">
+                    <input type="text" id="username" class="form-control" placeholder="ahmed.alii" required>
+                    <i class="fas fa-at input-icon"></i>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-lock"></i>
+                    كلمة المرور
+                </label>
+                <div class="input-with-icon">
+                    <input type="password" id="password" class="form-control" placeholder="********" required>
+                    <i class="fas fa-key input-icon"></i>
+                </div>
+                <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                    <button type="button" id="toggle-password" class="btn btn-sm btn-rounded" style="background: var(--gray-light); color: var(--dark);">
+                        <i class="fas fa-eye"></i> إظهار
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-rounded" style="width: 100%; margin-top: 20px;">
+                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+            </button>
+        </form>
+    </div>
+
+    <!-- النظام الرئيسي -->
+    <div id="main-system" class="container" style="display: none;">
+        <!-- الهيدر -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-hospital-alt"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>مستشفى الزهراء</h1>
+                    <p>نظام إدارة الصيانة الذكي</p>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">
+                    أ
+                </div>
+                <div class="user-details">
+                    <div class="user-name" id="current-user">أحمد علي</div>
+                    <div class="user-id" id="current-employee-id">EMP2024101</div>
+                </div>
+                <div class="user-role" id="current-role">موظف</div>
+                <button id="logout-button" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
+            </div>
+        </div>
+
+        <!-- شريط التنقل -->
+        <div class="nav-tabs">
+            <a href="#" class="nav-tab active" data-page="dashboard">
+                <i class="fas fa-home"></i>لوحة التحكم
+            </a>
+            <a href="#" class="nav-tab" data-page="report-issue" data-role="employee">
+                <i class="fas fa-exclamation-circle"></i>إبلاغ عن عطل
+            </a>
+            <a href="#" class="nav-tab" data-page="maintenance-requests" data-role="maintenance,maintenance-manager">
+                <i class="fas fa-tools"></i>طلبات الصيانة
+                <span id="maintenance-badge" class="badge">0</span>
+            </a>
+            <a href="#" class="nav-tab" data-page="maintenance-purchase" data-role="maintenance,maintenance-manager">
+                <i class="fas fa-shopping-bag"></i>شراء الصيانة
+            </a>
+            <a href="#" class="nav-tab" data-page="employee-requests" data-role="employee,purchasing">
+                <i class="fas fa-mobile-alt"></i>طلبات الموظفين
+            </a>
+            <a href="#" class="nav-tab" data-page="purchasing" data-role="maintenance-manager,purchasing">
+                <i class="fas fa-file-invoice-dollar"></i>المشتريات
+            </a>
+            <a href="#" class="nav-tab" data-page="reports">
+                <i class="fas fa-chart-bar"></i>التقارير
+            </a>
+        </div>
+
+        <!-- المحتوى -->
+        <div class="content">
+            <!-- لوحة التحكم -->
+            <div id="dashboard" class="page active">
+                <h2 style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 50px; height: 50px; background: var(--gradient-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-home" style="color: white; font-size: 24px;"></i>
+                    </div>
+                    <span>لوحة التحكم</span>
+                </h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-number" id="pending-count">0</div>
+                        <div class="stat-label">الأعطال المعلقة</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="stat-number" id="inprogress-count">0</div>
+                        <div class="stat-label">تحت الإصلاح</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-number" id="completed-count">0</div>
+                        <div class="stat-label">تم الإصلاح</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-number" id="purchase-count">0</div>
+                        <div class="stat-label">طلبات الشراء</div>
+                    </div>
+                </div>
+
+                <!-- إجراءات سريعة -->
+                <div style="margin: 40px 0; padding: 30px; background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+                    <h3 style="margin-bottom: 25px; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-bolt" style="color: var(--accent);"></i>
+                        إجراءات سريعة
+                    </h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-primary btn-rounded" onclick="sys.showPage('report-issue')">
+                            <i class="fas fa-plus"></i> إبلاغ عن عطل جديد
+                        </button>
+                        <button class="btn btn-success btn-rounded" onclick="sys.showEmployeeRequestForm()">
+                            <i class="fas fa-mobile-alt"></i> طلب جهاز جديد
+                        </button>
+                        <button class="btn btn-accent btn-rounded" onclick="sys.refreshDashboard()">
+                            <i class="fas fa-sync-alt"></i> تحديث البيانات
+                        </button>
+                        <button class="btn btn-warning btn-rounded" onclick="sys.exportReport()">
+                            <i class="fas fa-download"></i> تصدير التقرير
+                        </button>
+                    </div>
+                </div>
+
+                <!-- الطلبات الأخيرة -->
+                <div style="margin-top: 40px;">
+                    <h3 style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-history" style="color: var(--primary);"></i>
+                        الطلبات الأخيرة
+                    </h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>النوع</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-requests"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المودال -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title"></h3>
+                <button class="modal-close" onclick="sys.closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        class MaintenanceSystem {
+            constructor() {
+                this.currentUser = null;
+                this.currentRole = null;
+                this.initData();
+                this.initEventListeners();
+                this.loadFromStorage();
+            }
+
+            initData() {
+                // بيانات المستخدمين المصححة
+                this.users = {
+                    // الموظفون
+                    'EMP2024101': { 
+                        username: 'ahmed.alii', 
+                        password: 'Ahmed@2024!', 
+                        name: 'أحمد علي', 
+                        role: 'employee',
+                        avatarColor: '#4361ee'
+                    },
+                    'EMP2024102': { 
+                        username: 'sara.khalid', 
+                        password: 'Sara@2024!', 
+                        name: 'سارة خالد', 
+                        role: 'employee',
+                        avatarColor: '#f72585'
+                    },
+                    // مسؤولو الصيانة
+                    'MT2024101': { 
+                        username: 'ali.tech', 
+                        password: 'AliTech@2024!', 
+                        name: 'علي الفني', 
+                        role: 'maintenance',
+                        avatarColor: '#4cc9f0'
+                    },
+                    'MT2024102': { 
+                        username: 'hasan.engineer', 
+                        password: 'Hasan@2024!', 
+                        name: 'حسن المهندس', 
+                        role: 'maintenance',
+                        avatarColor: '#7209b7'
+                    },
+                    // مديرو الصيانة
+                    'MM2024101': { 
+                        username: 'yasser.director', 
+                        password: 'Yasser@2024!', 
+                        name: 'ياسر المدير', 
+                        role: 'maintenance-manager',
+                        avatarColor: '#f8961e'
+                    },
+                    // مديرو المشتريات
+                    'PM2024101': { 
+                        username: 'khalid.purchase', 
+                        password: 'Khalid@2024!', 
+                        name: 'خالد المشتريات', 
+                        role: 'purchasing',
+                        avatarColor: '#2ec4b6'
+                    },
+                    // الإدارة
+                    'AD2024101': { 
+                        username: 'admin.hospital', 
+                        password: 'Admin@2024!', 
+                        name: 'مدير النظام', 
+                        role: 'admin',
+                        avatarColor: '#4361ee'
+                    }
+                };
+
+                // بيانات الاختبار
+                this.maintenanceRequests = JSON.parse(localStorage.getItem('maintenanceRequests')) || [
+                    {
+                        id: 'MAINT-001',
+                        department: 'الطوارئ',
+                        room: '101',
+                        equipment: 'جهاز التنفس',
+                        title: 'عطل في جهاز التنفس',
+                        description: 'الجهاز لا يعمل بشكل صحيح ويحتاج لفحص فوري',
+                        priority: 'high',
+                        status: 'pending',
+                        date: '2024-01-10',
+                        reportedBy: 'أحمد علي',
+                        reportedById: 'EMP2024101'
+                    }
+                ];
+
+                this.purchaseRequests = JSON.parse(localStorage.getItem('purchaseRequests')) || [
+                    {
+                        id: 'PUR-001',
+                        maintenanceId: 'MAINT-001',
+                        partName: 'فلتر جهاز التنفس',
+                        quantity: 2,
+                        cost: 1500,
+                        reason: 'استبدال الفلتر المعطل',
+                        status: 'pending',
+                        date: '2024-01-10',
+                        requestedBy: 'علي الفني',
+                        type: 'maintenance'
+                    }
+                ];
+
+                this.employeeRequests = JSON.parse(localStorage.getItem('employeeRequests')) || [
+                    {
+                        id: 'EMP-REQ-001',
+                        deviceType: 'laptop',
+                        specs: 'i7, 16GB RAM, 512GB SSD',
+                        reason: 'للعمل على التقارير والمتابعة',
+                        status: 'pending',
+                        date: '2024-01-09',
+                        employee: 'أحمد علي',
+                        employeeId: 'EMP2024101',
+                        type: 'employee'
+                    }
+                ];
+            }
+
+            initEventListeners() {
+                // تسجيل الدخول
+                document.getElementById('login-form').addEventListener('submit', (e) => this.handleLogin(e));
+                
+                // تبديل كلمة المرور
+                document.getElementById('toggle-password').addEventListener('click', () => {
+                    const passwordInput = document.getElementById('password');
+                    const toggleBtn = document.getElementById('toggle-password');
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> إخفاء';
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleBtn.innerHTML = '<i class="fas fa-eye"></i> إظهار';
+                    }
+                });
+
+                // اختيار الدور
+                document.querySelectorAll('.role-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                    });
+                });
+
+                // تسجيل الخروج
+                document.getElementById('logout-button').addEventListener('click', () => this.handleLogout());
+
+                // التنقل
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const pageId = tab.getAttribute('data-page');
+                        const allowedRoles = tab.getAttribute('data-role');
+                        
+                        if (allowedRoles && !allowedRoles.includes(this.currentRole)) {
+                            this.showNotification('صلاحية غير كافية', 'لا تملك صلاحية الوصول إلى هذه الصفحة', 'error');
+                            return;
+                        }
+                        
+                        this.showPage(pageId);
+                        
+                        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                    });
+                });
+
+                window.sys = this;
+            }
+
+            handleLogin(e) {
+                e.preventDefault();
+                this.showLoader();
+
+                setTimeout(() => {
+                    const employeeId = document.getElementById('employee-id').value.trim();
+                    const username = document.getElementById('username').value.trim();
+                    const password = document.getElementById('password').value;
+                    const selectedRole = document.querySelector('.role-option.selected').getAttribute('data-role');
+                    const roleName = document.querySelector('.role-option.selected').getAttribute('data-role-name');
+
+                    console.log('بيانات المدخلة:', { employeeId, username, password, selectedRole });
+                    console.log('المستخدمون المتاحون:', Object.keys(this.users));
+
+                    // البحث عن المستخدم
+                    const user = this.users[employeeId];
+                    
+                    if (!user) {
+                        console.log('المستخدم غير موجود');
+                        this.hideLoader();
+                        this.showNotification('خطأ في التسجيل', 'رقم الموظف غير صحيح', 'error');
+                        return;
+                    }
+
+                    if (user.username !== username) {
+                        console.log('اسم المستخدم غير صحيح:', user.username, '!=', username);
+                        this.hideLoader();
+                        this.showNotification('خطأ في التسجيل', 'اسم المستخدم غير صحيح', 'error');
+                        return;
+                    }
+
+                    if (user.password !== password) {
+                        console.log('كلمة المرور غير صحيحة:', user.password, '!=', password);
+                        this.hideLoader();
+                        this.showNotification('خطأ في التسجيل', 'كلمة المرور غير صحيحة', 'error');
+                        return;
+                    }
+
+                    if (user.role !== selectedRole) {
+                        console.log('الدور غير صحيح:', user.role, '!=', selectedRole);
+                        this.hideLoader();
+                        this.showNotification('خطأ في التسجيل', 'الدور المختار غير صحيح', 'error');
+                        return;
+                    }
+
+                    // تسجيل الدخول الناجح
+                    this.currentUser = { 
+                        ...user, 
+                        employeeId: employeeId,
+                        roleName: roleName 
+                    };
+                    this.currentRole = selectedRole;
+
+                    console.log('تم تسجيل الدخول بنجاح:', this.currentUser);
+
+                    // تحديث الواجهة
+                    document.getElementById('current-user').textContent = user.name;
+                    document.getElementById('current-employee-id').textContent = employeeId;
+                    document.getElementById('current-role').textContent = roleName;
+                    document.getElementById('user-avatar').textContent = user.name.charAt(0);
+                    document.getElementById('user-avatar').style.background = user.avatarColor || 'var(--gradient-primary)';
+
+                    // إظهار النظام
+                    document.getElementById('login-page').style.display = 'none';
+                    document.getElementById('main-system').style.display = 'block';
+
+                    // تحديث الصلاحيات
+                    this.updatePermissions();
+                    this.refreshDashboard();
+
+                    this.hideLoader();
+                    this.showNotification('تم تسجيل الدخول', `مرحباً بك ${user.name}!`, 'success');
+                }, 1000);
+            }
+
+            handleLogout() {
+                this.showLoader();
+                
+                setTimeout(() => {
+                    this.currentUser = null;
+                    this.currentRole = null;
+                    
+                    document.getElementById('login-page').style.display = 'block';
+                    document.getElementById('main-system').style.display = 'none';
+                    document.getElementById('login-form').reset();
+                    
+                    document.querySelectorAll('.role-option').forEach((opt, i) => {
+                        opt.classList.toggle('selected', i === 0);
+                    });
+                    
+                    this.hideLoader();
+                    this.showNotification('تم تسجيل الخروج', 'إلى اللقاء! نتمنى لك يوماً سعيداً', 'info');
+                }, 500);
+            }
+
+            updatePermissions() {
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    const allowedRoles = tab.getAttribute('data-role');
+                    if (allowedRoles) {
+                        tab.style.display = allowedRoles.includes(this.currentRole) ? 'flex' : 'none';
+                    }
+                });
+            }
+
+            showPage(pageId) {
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                
+                if (!document.getElementById(pageId)) {
+                    this.createPage(pageId);
+                }
+                
+                document.getElementById(pageId).classList.add('active');
+                this.loadPageData(pageId);
+            }
+
+            createPage(pageId) {
+                const content = document.querySelector('.content');
+                const page = document.createElement('div');
+                page.id = pageId;
+                page.className = 'page';
+                
+                switch(pageId) {
+                    case 'report-issue':
+                        page.innerHTML = this.createReportIssuePage();
+                        break;
+                    case 'maintenance-requests':
+                        page.innerHTML = this.createMaintenanceRequestsPage();
+                        break;
+                    case 'maintenance-purchase':
+                        page.innerHTML = this.createMaintenancePurchasePage();
+                        break;
+                    case 'employee-requests':
+                        page.innerHTML = this.createEmployeeRequestsPage();
+                        break;
+                    case 'purchasing':
+                        page.innerHTML = this.createPurchasingPage();
+                        break;
+                    case 'reports':
+                        page.innerHTML = this.createReportsPage();
+                        break;
+                    default:
+                        page.innerHTML = '<div style="text-align: center; padding: 50px;"><h3>الصفحة قيد التطوير</h3></div>';
+                }
+                
+                content.appendChild(page);
+                this.setupPageEvents(pageId);
+            }
+
+            createReportIssuePage() {
+                return `
+                    <h2 style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: var(--gradient-danger); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-exclamation-circle" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <span>إبلاغ عن عطل</span>
+                    </h2>
+                    
+                    <form id="issue-form">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-building"></i> القسم *</label>
+                            <select class="form-control" id="department" required>
+                                <option value="">اختر القسم</option>
+                                <option value="emergency">الطوارئ</option>
+                                <option value="surgery">الجراحة</option>
+                                <option value="radiology">الأشعة</option>
+                                <option value="icu">العناية المركزة</option>
+                                <option value="laboratory">المختبر</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-door-closed"></i> رقم الغرفة *</label>
+                            <input type="text" class="form-control" id="room" placeholder="مثل: 101" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-cogs"></i> الجهاز المعطل</label>
+                            <input type="text" class="form-control" id="equipment" placeholder="اسم الجهاز أو الرقم التسلسلي">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-heading"></i> عنوان العطل *</label>
+                            <input type="text" class="form-control" id="title" placeholder="وصف مختصر للعطل" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-align-left"></i> وصف العطل *</label>
+                            <textarea class="form-control" id="description" rows="4" placeholder="اشرح العطل بالتفصيل..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-exclamation-triangle"></i> أولوية العطل *</label>
+                            <select class="form-control" id="priority" required>
+                                <option value="low">منخفض</option>
+                                <option value="medium" selected>متوسط</option>
+                                <option value="high">مرتفع</option>
+                                <option value="emergency">طارئ</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button type="button" class="btn btn-rounded" onclick="sys.showPage('dashboard')" style="background: var(--gray-light); color: var(--dark);">
+                                <i class="fas fa-arrow-right"></i> العودة
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-rounded">
+                                <i class="fas fa-paper-plane"></i> إرسال البلاغ
+                            </button>
+                        </div>
+                    </form>
+                `;
+            }
+
+            createMaintenanceRequestsPage() {
+                return `
+                    <h2 style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: var(--gradient-warning); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-tools" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <span>طلبات الصيانة</span>
+                    </h2>
+                    
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <input type="text" id="search-maintenance" class="form-control" placeholder="بحث في الطلبات...">
+                        </div>
+                        <select class="form-control" id="filter-status" style="width: 150px;">
+                            <option value="">جميع الحالات</option>
+                            <option value="pending">معلقة</option>
+                            <option value="in-progress">قيد التنفيذ</option>
+                            <option value="completed">مكتملة</option>
+                        </select>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>القسم</th>
+                                    <th>العطل</th>
+                                    <th>الأولوية</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maintenance-table-body"></tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            createMaintenancePurchasePage() {
+                return `
+                    <h2 style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: var(--gradient-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-shopping-bag" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <span>طلبات شراء قطع الصيانة</span>
+                    </h2>
+                    
+                    ${this.currentRole === 'maintenance' ? `
+                    <button class="btn btn-primary" onclick="sys.showPurchaseRequestForm()" style="margin-bottom: 20px;">
+                        <i class="fas fa-plus"></i> طلب شراء جديد
+                    </button>
+                    ` : ''}
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>القطعة</th>
+                                    <th>الكمية</th>
+                                    <th>التكلفة</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchase-table-body"></tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            createEmployeeRequestsPage() {
+                return `
+                    <h2 style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: var(--gradient-accent); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-mobile-alt" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <span>طلبات الموظفين</span>
+                    </h2>
+                    
+                    ${this.currentRole === 'employee' ? `
+                    <button class="btn btn-primary" onclick="sys.showEmployeeRequestForm()" style="margin-bottom: 20px;">
+                        <i class="fas fa-plus"></i> طلب جديد
+                    </button>
+                    ` : ''}
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>الموظف</th>
+                                    <th>نوع الجهاز</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employee-table-body"></tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            createPurchasingPage() {
+                return `
+                    <h2 style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: var(--gradient-success); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-file-invoice-dollar" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <span>إدارة المشتريات</span>
+                    </h2>
+                    
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                        <select class="form-control" id="filter-purchase-type" style="width: 200px;">
+                            <option value="">جميع الأنواع</option>
+                            <option value="maintenance">قطع صيانة</option>
+                            <option value="employee">أجهزة موظفين</option>
+                        </select>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>النوع</th>
+                                    <th>الوصف</th>
+                                    <th>التكلفة</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchasing-table-body"></tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            createReportsPage() {
+                return `
+                    <h2 style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: var(--gradient-success); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-chart-bar" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <span>التقارير والإحصائيات</span>
+                    </h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                            <div class="stat-number" id="total-maintenance">${this.maintenanceRequests.length}</div>
+                            <div class="stat-label">إجمالي طلبات الصيانة</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-number" id="avg-response">24</div>
+                            <div class="stat-label">متوسط وقت الاستجابة (ساعة)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="stat-number" id="total-cost">${this.purchaseRequests.reduce((sum, r) => sum + (parseFloat(r.cost) || 0), 0)}</div>
+                            <div class="stat-label">إجمالي تكاليف الصيانة</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="stat-number" id="completion-rate">${this.maintenanceRequests.length > 0 ? Math.round((this.maintenanceRequests.filter(r => r.status === 'completed').length / this.maintenanceRequests.length) * 100) : 0}%</div>
+                            <div class="stat-label">نسبة إتمام الصيانة</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 40px;">
+                        <button class="btn btn-primary" onclick="sys.exportReport()">
+                            <i class="fas fa-download"></i> تصدير تقرير
+                        </button>
+                    </div>
+                `;
+            }
+
+            setupPageEvents(pageId) {
+                setTimeout(() => {
+                    switch(pageId) {
+                        case 'report-issue':
+                            const issueForm = document.getElementById('issue-form');
+                            if (issueForm) {
+                                issueForm.addEventListener('submit', (e) => this.submitIssue(e));
+                            }
+                            break;
+                        case 'maintenance-requests':
+                            const searchInput = document.getElementById('search-maintenance');
+                            const filterSelect = document.getElementById('filter-status');
+                            if (searchInput) {
+                                searchInput.addEventListener('input', () => this.filterMaintenanceRequests());
+                            }
+                            if (filterSelect) {
+                                filterSelect.addEventListener('change', () => this.filterMaintenanceRequests());
+                            }
+                            this.loadMaintenanceRequests();
+                            break;
+                        case 'maintenance-purchase':
+                            this.loadPurchaseRequests();
+                            break;
+                        case 'employee-requests':
+                            this.loadEmployeeRequests();
+                            break;
+                        case 'purchasing':
+                            const purchaseFilter = document.getElementById('filter-purchase-type');
+                            if (purchaseFilter) {
+                                purchaseFilter.addEventListener('change', () => this.filterPurchasing());
+                            }
+                            this.loadPurchasing();
+                            break;
+                    }
+                }, 100);
+            }
+
+            loadPageData(pageId) {
+                switch(pageId) {
+                    case 'dashboard':
+                        this.refreshDashboard();
+                        break;
+                    case 'maintenance-requests':
+                        this.loadMaintenanceRequests();
+                        break;
+                    case 'maintenance-purchase':
+                        this.loadPurchaseRequests();
+                        break;
+                    case 'employee-requests':
+                        this.loadEmployeeRequests();
+                        break;
+                    case 'purchasing':
+                        this.loadPurchasing();
+                        break;
+                    case 'reports':
+                        this.loadReports();
+                        break;
+                }
+            }
+
+            refreshDashboard() {
+                const pending = this.maintenanceRequests.filter(r => r.status === 'pending').length;
+                const inProgress = this.maintenanceRequests.filter(r => r.status === 'in-progress').length;
+                const completed = this.maintenanceRequests.filter(r => r.status === 'completed').length;
+                const purchasePending = this.purchaseRequests.filter(r => r.status === 'pending').length;
+
+                document.getElementById('pending-count').textContent = pending;
+                document.getElementById('inprogress-count').textContent = inProgress;
+                document.getElementById('completed-count').textContent = completed;
+                document.getElementById('purchase-count').textContent = purchasePending;
+
+                const badge = document.getElementById('maintenance-badge');
+                badge.textContent = pending;
+                badge.style.display = pending > 0 ? 'inline-flex' : 'none';
+
+                this.loadRecentRequests();
+            }
+
+            loadRecentRequests() {
+                const tbody = document.getElementById('recent-requests');
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+
+                const allRequests = [
+                    ...this.maintenanceRequests.map(r => ({...r, type: 'صيانة'})),
+                    ...this.purchaseRequests.map(r => ({...r, type: 'شراء'})),
+                    ...this.employeeRequests.map(r => ({...r, type: 'موظف'}))
+                ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+
+                allRequests.forEach(req => {
+                    const row = document.createElement('tr');
+                    let statusClass = 'status-pending';
+                    let statusText = 'معلق';
+
+                    if (req.type === 'صيانة') {
+                        if (req.status === 'in-progress') {
+                            statusClass = 'status-in-progress';
+                            statusText = 'قيد التنفيذ';
+                        } else if (req.status === 'completed') {
+                            statusClass = 'status-completed';
+                            statusText = 'مكتمل';
+                        }
+                    } else if (req.type === 'شراء' || req.type === 'موظف') {
+                        if (req.status === 'approved') {
+                            statusClass = 'status-approved';
+                            statusText = 'معتمد';
+                        } else if (req.status === 'rejected') {
+                            statusClass = 'status-rejected';
+                            statusText = 'مرفوض';
+                        } else if (req.status === 'ordered') {
+                            statusClass = 'status-completed';
+                            statusText = 'تم الطلب';
+                        }
+                    }
+
+                    row.innerHTML = `
+                        <td>${req.id}</td>
+                        <td>${req.type}</td>
+                        <td>${req.date}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            submitIssue(e) {
+                e.preventDefault();
+                this.showLoader();
+
+                setTimeout(() => {
+                    const newId = 'MAINT-' + (this.maintenanceRequests.length + 1).toString().padStart(3, '0');
+                    const newRequest = {
+                        id: newId,
+                        department: document.getElementById('department').value,
+                        room: document.getElementById('room').value,
+                        equipment: document.getElementById('equipment').value,
+                        title: document.getElementById('title').value,
+                        description: document.getElementById('description').value,
+                        priority: document.getElementById('priority').value,
+                        status: 'pending',
+                        date: new Date().toISOString().split('T')[0],
+                        reportedBy: this.currentUser.name,
+                        reportedById: this.currentUser.employeeId
+                    };
+
+                    this.maintenanceRequests.unshift(newRequest);
+                    this.saveToStorage();
+                    this.refreshDashboard();
+                    
+                    document.querySelector('.nav-tab[data-page="dashboard"]').click();
+                    
+                    this.hideLoader();
+                    this.showNotification('تم الإرسال', `تم إرسال طلب الصيانة برقم ${newId}`, 'success');
+                }, 500);
+            }
+
+            loadMaintenanceRequests() {
+                const tbody = document.getElementById('maintenance-table-body');
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+                
+                this.maintenanceRequests.forEach(req => {
+                    const row = document.createElement('tr');
+                    
+                    let statusClass = 'status-pending';
+                    let statusText = 'معلق';
+                    if (req.status === 'in-progress') {
+                        statusClass = 'status-in-progress';
+                        statusText = 'قيد التنفيذ';
+                    } else if (req.status === 'completed') {
+                        statusClass = 'status-completed';
+                        statusText = 'مكتمل';
+                    }
+
+                    let priorityText = '';
+                    switch(req.priority) {
+                        case 'low': priorityText = 'منخفض'; break;
+                        case 'medium': priorityText = 'متوسط'; break;
+                        case 'high': priorityText = 'مرتفع'; break;
+                        case 'emergency': priorityText = 'طارئ'; break;
+                    }
+
+                    row.innerHTML = `
+                        <td>${req.id}</td>
+                        <td>${req.department}</td>
+                        <td>${req.title}</td>
+                        <td>${priorityText}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="sys.viewRequest('${req.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${this.currentRole === 'maintenance' && req.status === 'pending' ? `
+                            <button class="btn btn-sm btn-success" onclick="sys.startRepair('${req.id}')" style="margin-right: 5px;">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            filterMaintenanceRequests() {
+                const search = document.getElementById('search-maintenance')?.value.toLowerCase() || '';
+                const status = document.getElementById('filter-status')?.value || '';
+                
+                const filtered = this.maintenanceRequests.filter(req => {
+                    const matchesSearch = req.id.toLowerCase().includes(search) || 
+                                         req.title.toLowerCase().includes(search) ||
+                                         req.department.toLowerCase().includes(search);
+                    const matchesStatus = !status || req.status === status;
+                    return matchesSearch && matchesStatus;
+                });
+
+                const tbody = document.getElementById('maintenance-table-body');
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+                
+                filtered.forEach(req => {
+                    const row = document.createElement('tr');
+                    
+                    let statusClass = 'status-pending';
+                    let statusText = 'معلق';
+                    if (req.status === 'in-progress') {
+                        statusClass = 'status-in-progress';
+                        statusText = 'قيد التنفيذ';
+                    } else if (req.status === 'completed') {
+                        statusClass = 'status-completed';
+                        statusText = 'مكتمل';
+                    }
+
+                    let priorityText = '';
+                    switch(req.priority) {
+                        case 'low': priorityText = 'منخفض'; break;
+                        case 'medium': priorityText = 'متوسط'; break;
+                        case 'high': priorityText = 'مرتفع'; break;
+                        case 'emergency': priorityText = 'طارئ'; break;
+                    }
+
+                    row.innerHTML = `
+                        <td>${req.id}</td>
+                        <td>${req.department}</td>
+                        <td>${req.title}</td>
+                        <td>${priorityText}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="sys.viewRequest('${req.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${this.currentRole === 'maintenance' && req.status === 'pending' ? `
+                            <button class="btn btn-sm btn-success" onclick="sys.startRepair('${req.id}')" style="margin-right: 5px;">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            viewRequest(requestId) {
+                const request = this.maintenanceRequests.find(r => r.id === requestId);
+                if (!request) return;
+
+                let statusText = '';
+                switch(request.status) {
+                    case 'pending': statusText = 'معلق'; break;
+                    case 'in-progress': statusText = 'قيد التنفيذ'; break;
+                    case 'completed': statusText = 'مكتمل'; break;
+                }
+
+                let priorityText = '';
+                switch(request.priority) {
+                    case 'low': priorityText = 'منخفض'; break;
+                    case 'medium': priorityText = 'متوسط'; break;
+                    case 'high': priorityText = 'مرتفع'; break;
+                    case 'emergency': priorityText = 'طارئ'; break;
+                }
+
+                let actions = '';
+                if (this.currentRole === 'maintenance') {
+                    if (request.status === 'pending') {
+                        actions = `
+                            <button class="btn btn-success" onclick="sys.startRepair('${requestId}'); sys.closeModal()">
+                                <i class="fas fa-play"></i> بدء الإصلاح
+                            </button>
+                        `;
+                    } else if (request.status === 'in-progress') {
+                        actions = `
+                            <button class="btn btn-primary" onclick="sys.completeRepair('${requestId}'); sys.closeModal()">
+                                <i class="fas fa-check"></i> إكمال الإصلاح
+                            </button>
+                            <button class="btn btn-info" onclick="sys.requestPurchase('${requestId}')" style="margin-right: 10px;">
+                                <i class="fas fa-shopping-cart"></i> طلب شراء قطع
+                            </button>
+                        `;
+                    }
+                }
+
+                this.openModal('تفاصيل الطلب', `
+                    <h4>${request.id}</h4>
+                    <p><strong>القسم:</strong> ${request.department}</p>
+                    <p><strong>الغرفة:</strong> ${request.room}</p>
+                    <p><strong>الجهاز:</strong> ${request.equipment}</p>
+                    <p><strong>العطل:</strong> ${request.title}</p>
+                    <p><strong>الوصف:</strong> ${request.description}</p>
+                    <p><strong>الأولوية:</strong> ${priorityText}</p>
+                    <p><strong>الحالة:</strong> ${statusText}</p>
+                    <p><strong>تاريخ الإبلاغ:</strong> ${request.date}</p>
+                    <p><strong>المبلغ:</strong> ${request.reportedBy}</p>
+                    
+                    <div style="margin-top: 20px;">
+                        ${actions}
+                    </div>
+                `);
+            }
+
+            startRepair(requestId) {
+                const request = this.maintenanceRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.status = 'in-progress';
+                    request.assignedTo = this.currentUser.name;
+                    request.startDate = new Date().toISOString();
+                    this.saveToStorage();
+                    this.loadMaintenanceRequests();
+                    this.refreshDashboard();
+                    this.showNotification('تم البدء', 'تم بدء عملية الإصلاح', 'success');
+                }
+            }
+
+            completeRepair(requestId) {
+                const request = this.maintenanceRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.status = 'completed';
+                    request.completedDate = new Date().toISOString();
+                    this.saveToStorage();
+                    this.loadMaintenanceRequests();
+                    this.refreshDashboard();
+                    this.showNotification('تم الإكمال', 'تم إكمال عملية الإصلاح', 'success');
+                }
+            }
+
+            requestPurchase(requestId) {
+                this.openModal('طلب شراء قطع', `
+                    <form id="purchase-form">
+                        <div class="form-group">
+                            <label>اسم القطعة *</label>
+                            <input type="text" class="form-control" id="part-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الكمية *</label>
+                            <input type="number" class="form-control" id="part-quantity" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>التكلفة التقديرية *</label>
+                            <input type="number" class="form-control" id="part-cost" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>سبب الطلب *</label>
+                            <textarea class="form-control" id="part-reason" required></textarea>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button type="button" class="btn btn-primary" onclick="sys.submitPurchaseRequest('${requestId}')">إرسال الطلب</button>
+                        </div>
+                    </form>
+                `);
+            }
+
+            submitPurchaseRequest(requestId) {
+                const newId = 'PUR-' + (this.purchaseRequests.length + 1).toString().padStart(3, '0');
+                const purchase = {
+                    id: newId,
+                    maintenanceId: requestId,
+                    partName: document.getElementById('part-name').value,
+                    quantity: document.getElementById('part-quantity').value,
+                    cost: document.getElementById('part-cost').value,
+                    reason: document.getElementById('part-reason').value,
+                    status: 'pending',
+                    date: new Date().toISOString().split('T')[0],
+                    requestedBy: this.currentUser.name,
+                    type: 'maintenance'
+                };
+
+                this.purchaseRequests.push(purchase);
+                this.saveToStorage();
+                this.closeModal();
+                this.showNotification('تم الطلب', 'تم إرسال طلب الشراء', 'success');
+                this.loadPurchaseRequests();
+            }
+
+            showEmployeeRequestForm() {
+                this.openModal('طلب جهاز جديد', `
+                    <form id="employee-request-form">
+                        <div class="form-group">
+                            <label>نوع الجهاز *</label>
+                            <select class="form-control" id="device-type" required>
+                                <option value="">اختر نوع الجهاز</option>
+                                <option value="laptop">لابتوب</option>
+                                <option value="mobile">هاتف</option>
+                                <option value="printer">طابعة</option>
+                                <option value="other">أخرى</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>المواصفات *</label>
+                            <textarea class="form-control" id="device-specs" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>سبب الطلب *</label>
+                            <textarea class="form-control" id="device-reason" required></textarea>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button type="button" class="btn btn-primary" onclick="sys.submitEmployeeRequest()">إرسال الطلب</button>
+                        </div>
+                    </form>
+                `);
+            }
+
+            submitEmployeeRequest() {
+                const newId = 'EMP-REQ-' + (this.employeeRequests.length + 1).toString().padStart(3, '0');
+                const request = {
+                    id: newId,
+                    deviceType: document.getElementById('device-type').value,
+                    specs: document.getElementById('device-specs').value,
+                    reason: document.getElementById('device-reason').value,
+                    status: 'pending',
+                    date: new Date().toISOString().split('T')[0],
+                    employee: this.currentUser.name,
+                    employeeId: this.currentUser.employeeId,
+                    type: 'employee'
+                };
+
+                this.employeeRequests.push(request);
+                this.saveToStorage();
+                this.closeModal();
+                this.showNotification('تم الطلب', 'تم إرسال طلب الجهاز', 'success');
+                this.loadEmployeeRequests();
+            }
+
+            loadEmployeeRequests() {
+                const tbody = document.getElementById('employee-table-body');
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+                
+                let requests = this.employeeRequests;
+                if (this.currentRole === 'employee') {
+                    requests = requests.filter(r => r.employeeId === this.currentUser.employeeId);
+                }
+
+                requests.forEach(r => {
+                    const row = document.createElement('tr');
+                    
+                    let deviceTypeText = '';
+                    switch(r.deviceType) {
+                        case 'laptop': deviceTypeText = 'لابتوب'; break;
+                        case 'mobile': deviceTypeText = 'هاتف'; break;
+                        case 'printer': deviceTypeText = 'طابعة'; break;
+                        default: deviceTypeText = 'أخرى';
+                    }
+
+                    let statusClass = 'status-pending';
+                    let statusText = 'قيد الانتظار';
+                    if (r.status === 'approved') {
+                        statusClass = 'status-approved';
+                        statusText = 'معتمد';
+                    } else if (r.status === 'rejected') {
+                        statusClass = 'status-rejected';
+                        statusText = 'مرفوض';
+                    }
+
+                    row.innerHTML = `
+                        <td>${r.id}</td>
+                        <td>${r.employee}</td>
+                        <td>${deviceTypeText}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="sys.viewEmployeeRequest('${r.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${this.currentRole === 'purchasing' && r.status === 'pending' ? `
+                            <button class="btn btn-sm btn-success" onclick="sys.approveEmployeeRequest('${r.id}')" style="margin-right: 5px;">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="sys.rejectEmployeeRequest('${r.id}')" style="margin-right: 5px;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            viewEmployeeRequest(requestId) {
+                const request = this.employeeRequests.find(r => r.id === requestId);
+                if (!request) return;
+
+                let deviceTypeText = '';
+                switch(request.deviceType) {
+                    case 'laptop': deviceTypeText = 'لابتوب'; break;
+                    case 'mobile': deviceTypeText = 'هاتف'; break;
+                    case 'printer': deviceTypeText = 'طابعة'; break;
+                    default: deviceTypeText = 'أخرى';
+                }
+
+                let statusText = '';
+                switch(request.status) {
+                    case 'pending': statusText = 'قيد الانتظار'; break;
+                    case 'approved': statusText = 'معتمد'; break;
+                    case 'rejected': statusText = 'مرفوض'; break;
+                }
+
+                this.openModal('تفاصيل طلب الموظف', `
+                    <h4>${request.id}</h4>
+                    <p><strong>الموظف:</strong> ${request.employee}</p>
+                    <p><strong>نوع الجهاز:</strong> ${deviceTypeText}</p>
+                    <p><strong>المواصفات:</strong> ${request.specs}</p>
+                    <p><strong>سبب الطلب:</strong> ${request.reason}</p>
+                    <p><strong>الحالة:</strong> ${statusText}</p>
+                    <p><strong>تاريخ الطلب:</strong> ${request.date}</p>
+                `);
+            }
+
+            approveEmployeeRequest(requestId) {
+                const request = this.employeeRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.status = 'approved';
+                    this.saveToStorage();
+                    this.loadEmployeeRequests();
+                    this.showNotification('تم الاعتماد', 'تم اعتماد طلب الموظف', 'success');
+                }
+            }
+
+            rejectEmployeeRequest(requestId) {
+                const request = this.employeeRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.status = 'rejected';
+                    this.saveToStorage();
+                    this.loadEmployeeRequests();
+                    this.showNotification('تم الرفض', 'تم رفض طلب الموظف', 'warning');
+                }
+            }
+
+            loadPurchaseRequests() {
+                const tbody = document.getElementById('purchase-table-body');
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+                
+                let requests = this.purchaseRequests;
+                if (this.currentRole === 'maintenance') {
+                    requests = requests.filter(r => r.requestedBy === this.currentUser.name);
+                }
+
+                requests.forEach(r => {
+                    const row = document.createElement('tr');
+                    
+                    let statusClass = 'status-pending';
+                    let statusText = 'قيد الانتظار';
+                    if (r.status === 'approved') {
+                        statusClass = 'status-approved';
+                        statusText = 'معتمد';
+                    } else if (r.status === 'rejected') {
+                        statusClass = 'status-rejected';
+                        statusText = 'مرفوض';
+                    } else if (r.status === 'ordered') {
+                        statusClass = 'status-completed';
+                        statusText = 'تم الطلب';
+                    }
+
+                    row.innerHTML = `
+                        <td>${r.id}</td>
+                        <td>${r.partName}</td>
+                        <td>${r.quantity}</td>
+                        <td>${r.cost} ريال</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="sys.viewPurchaseRequest('${r.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${this.currentRole === 'maintenance-manager' && r.status === 'pending' ? `
+                            <button class="btn btn-sm btn-success" onclick="sys.approvePurchaseRequest('${r.id}')" style="margin-right: 5px;">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="sys.rejectPurchaseRequest('${r.id}')" style="margin-right: 5px;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            viewPurchaseRequest(requestId) {
+                const request = this.purchaseRequests.find(r => r.id === requestId);
+                if (!request) return;
+
+                let statusText = '';
+                switch(request.status) {
+                    case 'pending': statusText = 'قيد الانتظار'; break;
+                    case 'approved': statusText = 'معتمد'; break;
+                    case 'rejected': statusText = 'مرفوض'; break;
+                    case 'ordered': statusText = 'تم الطلب'; break;
+                }
+
+                this.openModal('تفاصيل طلب الشراء', `
+                    <h4>${request.id}</h4>
+                    <p><strong>رقم طلب الصيانة:</strong> ${request.maintenanceId || 'غير محدد'}</p>
+                    <p><strong>القطعة:</strong> ${request.partName}</p>
+                    <p><strong>الكمية:</strong> ${request.quantity}</p>
+                    <p><strong>التكلفة:</strong> ${request.cost} ريال</p>
+                    <p><strong>السبب:</strong> ${request.reason}</p>
+                    <p><strong>الحالة:</strong> ${statusText}</p>
+                    <p><strong>تاريخ الطلب:</strong> ${request.date}</p>
+                    <p><strong>مقدم الطلب:</strong> ${request.requestedBy}</p>
+                `);
+            }
+
+            approvePurchaseRequest(requestId) {
+                const request = this.purchaseRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.status = 'approved';
+                    this.saveToStorage();
+                    this.loadPurchaseRequests();
+                    this.showNotification('تم الاعتماد', 'تم اعتماد طلب الشراء', 'success');
+                }
+            }
+
+            rejectPurchaseRequest(requestId) {
+                const request = this.purchaseRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.status = 'rejected';
+                    this.saveToStorage();
+                    this.loadPurchaseRequests();
+                    this.showNotification('تم الرفض', 'تم رفض طلب الشراء', 'warning');
+                }
+            }
+
+            loadPurchasing() {
+                const tbody = document.getElementById('purchasing-table-body');
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+                
+                const filterType = document.getElementById('filter-purchase-type')?.value || '';
+                let requests = [...this.purchaseRequests, ...this.employeeRequests];
+
+                if (filterType === 'maintenance') {
+                    requests = requests.filter(r => r.type === 'maintenance');
+                } else if (filterType === 'employee') {
+                    requests = requests.filter(r => r.type === 'employee');
+                }
+
+                requests.forEach(r => {
+                    const row = document.createElement('tr');
+                    
+                    let typeText = r.type === 'maintenance' ? 'قطع صيانة' : 'جهاز موظف';
+                    let description = r.partName || r.deviceType || '';
+                    
+                    let statusClass = 'status-pending';
+                    let statusText = 'قيد الانتظار';
+                    if (r.status === 'approved') {
+                        statusClass = 'status-approved';
+                        statusText = 'معتمد';
+                    } else if (r.status === 'rejected') {
+                        statusClass = 'status-rejected';
+                        statusText = 'مرفوض';
+                    } else if (r.status === 'ordered') {
+                        statusClass = 'status-completed';
+                        statusText = 'تم الطلب';
+                    }
+
+                    row.innerHTML = `
+                        <td>${r.id}</td>
+                        <td>${typeText}</td>
+                        <td>${description}</td>
+                        <td>${r.cost || '0'} ريال</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="${r.type === 'maintenance' ? `sys.viewPurchaseRequest('${r.id}')` : `sys.viewEmployeeRequest('${r.id}')`}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${this.currentRole === 'purchasing' && r.status === 'approved' ? `
+                            <button class="btn btn-sm btn-success" onclick="sys.markAsOrdered('${r.id}')" style="margin-right: 5px;">
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            filterPurchasing() {
+                this.loadPurchasing();
+            }
+
+            markAsOrdered(requestId) {
+                let request = this.purchaseRequests.find(r => r.id === requestId);
+                if (!request) {
+                    request = this.employeeRequests.find(r => r.id === requestId);
+                }
+                
+                if (request) {
+                    request.status = 'ordered';
+                    this.saveToStorage();
+                    this.loadPurchasing();
+                    this.showNotification('تم الطلب', 'تم تسجيل الطلب كتم طلبه', 'success');
+                }
+            }
+
+            loadReports() {
+                const totalMaintenance = this.maintenanceRequests.length;
+                const completedMaintenance = this.maintenanceRequests.filter(r => r.status === 'completed').length;
+                const avgResponse = completedMaintenance > 0 ? '24' : '0';
+                const totalCost = this.purchaseRequests.reduce((sum, r) => sum + (parseFloat(r.cost) || 0), 0);
+                const completionRate = this.maintenanceRequests.length > 0 ? Math.round((completedMaintenance / this.maintenanceRequests.length) * 100) : 0;
+
+                document.getElementById('total-maintenance').textContent = totalMaintenance;
+                document.getElementById('avg-response').textContent = avgResponse;
+                document.getElementById('total-cost').textContent = totalCost.toLocaleString();
+                document.getElementById('completion-rate').textContent = completionRate + '%';
+            }
+
+            exportReport() {
+                const reportData = {
+                    date: new Date().toLocaleDateString('ar-SA'),
+                    hospital: 'مستشفى الزهراء',
+                    statistics: {
+                        totalMaintenance: this.maintenanceRequests.length,
+                        pending: this.maintenanceRequests.filter(r => r.status === 'pending').length,
+                        inProgress: this.maintenanceRequests.filter(r => r.status === 'in-progress').length,
+                        completed: this.maintenanceRequests.filter(r => r.status === 'completed').length,
+                        totalCost: this.purchaseRequests.reduce((sum, r) => sum + (parseFloat(r.cost) || 0), 0)
+                    },
+                    recentRequests: this.maintenanceRequests.slice(0, 5)
+                };
+
+                let reportContent = `
+                    تقرير نظام إدارة الصيانة
+                    ==========================
+                    
+                    تاريخ التقرير: ${reportData.date}
+                    المستشفى: ${reportData.hospital}
+                    
+                    الإحصائيات:
+                    ----------
+                    إجمالي طلبات الصيانة: ${reportData.statistics.totalMaintenance}
+                    الطلبات المعلقة: ${reportData.statistics.pending}
+                    الطلبات قيد التنفيذ: ${reportData.statistics.inProgress}
+                    الطلبات المكتملة: ${reportData.statistics.completed}
+                    إجمالي التكاليف: ${reportData.statistics.totalCost} ريال
+                    
+                    الطلبات الأخيرة:
+                    ---------------
+                `;
+
+                reportData.recentRequests.forEach((req, index) => {
+                    reportContent += `
+                    ${index + 1}. ${req.id}
+                       - القسم: ${req.department}
+                       - العطل: ${req.title}
+                       - الحالة: ${req.status}
+                       - التاريخ: ${req.date}
+                    `;
+                });
+
+                reportContent += `
+                    
+                    تم إنشاء التقرير بواسطة: ${this.currentUser.name}
+                    ===========================================
+                `;
+
+                const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `تقرير-الصيانة-${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                this.showNotification('تم التصدير', 'تم إنشاء التقرير بنجاح', 'success');
+            }
+
+            showPurchaseRequestForm() {
+                this.openModal('طلب شراء قطع صيانة', `
+                    <form id="new-purchase-form">
+                        <div class="form-group">
+                            <label>اسم القطعة *</label>
+                            <input type="text" class="form-control" id="new-part-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الكمية *</label>
+                            <input type="number" class="form-control" id="new-part-quantity" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>التكلفة التقديرية *</label>
+                            <input type="number" class="form-control" id="new-part-cost" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>السبب *</label>
+                            <textarea class="form-control" id="new-part-reason" required></textarea>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button type="button" class="btn btn-primary" onclick="sys.submitNewPurchaseRequest()">إرسال الطلب</button>
+                        </div>
+                    </form>
+                `);
+            }
+
+            submitNewPurchaseRequest() {
+                const newId = 'PUR-' + (this.purchaseRequests.length + 1).toString().padStart(3, '0');
+                const purchase = {
+                    id: newId,
+                    partName: document.getElementById('new-part-name').value,
+                    quantity: document.getElementById('new-part-quantity').value,
+                    cost: document.getElementById('new-part-cost').value,
+                    reason: document.getElementById('new-part-reason').value,
+                    status: 'pending',
+                    date: new Date().toISOString().split('T')[0],
+                    requestedBy: this.currentUser.name,
+                    type: 'maintenance'
+                };
+
+                this.purchaseRequests.push(purchase);
+                this.saveToStorage();
+                this.closeModal();
+                this.loadPurchaseRequests();
+                this.showNotification('تم الطلب', 'تم إرسال طلب الشراء', 'success');
+            }
+
+            showNotification(title, message, type = 'info') {
+                const container = document.getElementById('notification-system');
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.innerHTML = `
+                    <div class="notification-icon">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px;">${title}</div>
+                        <div style="font-size: 13px; color: var(--gray); margin-top: 5px;">${message}</div>
+                    </div>
+                `;
+
+                container.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
+
+            openModal(title, content) {
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-body').innerHTML = content;
+                document.getElementById('modal-overlay').classList.add('active');
+            }
+
+            closeModal() {
+                document.getElementById('modal-overlay').classList.remove('active');
+            }
+
+            showLoader() {
+                document.getElementById('loader').classList.add('active');
+            }
+
+            hideLoader() {
+                document.getElementById('loader').classList.remove('active');
+            }
+
+            saveToStorage() {
+                localStorage.setItem('maintenanceRequests', JSON.stringify(this.maintenanceRequests));
+                localStorage.setItem('purchaseRequests', JSON.stringify(this.purchaseRequests));
+                localStorage.setItem('employeeRequests', JSON.stringify(this.employeeRequests));
+            }
+
+            loadFromStorage() {
+                try {
+                    const maintenance = localStorage.getItem('maintenanceRequests');
+                    const purchases = localStorage.getItem('purchaseRequests');
+                    const employees = localStorage.getItem('employeeRequests');
+
+                    if (maintenance) this.maintenanceRequests = JSON.parse(maintenance);
+                    if (purchases) this.purchaseRequests = JSON.parse(purchases);
+                    if (employees) this.employeeRequests = JSON.parse(employees);
+                } catch (e) {
+                    console.log('Using default data');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const system = new MaintenanceSystem();
+        });
+    </script>
+</body>
+</html>
